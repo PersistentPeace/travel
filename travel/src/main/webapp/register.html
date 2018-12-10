@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>注册</title>
+    <link rel="stylesheet" type="text/css" href="css/common.css">
+    <link rel="stylesheet" href="css/register.css">
+    <!--导入jquery-->
+    <script src="js/jquery-3.3.1.js"></script>
+</head>
+<body>
+<!--引入头部-->
+<div id="header"></div>
+<!-- 头部 end -->
+<div class="rg_layout">
+    <div class="rg_form clearfix">
+        <div class="rg_form_left">
+            <p>新用户注册</p>
+            <p>USER REGISTER</p>
+        </div>
+        <div class="rg_form_center">
+
+            <script>
+                $(function () {
+                    //1. 页面加载完毕后, 给表单绑定提交事件. 注意, 不管function里面是什么情况, 都是return false
+                    // 也就是不提交表单, 我们通过异步方式与服务器进行交互.当数据满足某些条件的时候, 向服务器提交数据.
+                    $("#registerForm").submit(function () {
+
+                        //2. 校验用户名，校验要求用户名字符长度6~18个字符，首字符必须为英文字母，其
+                        //  它字符范围为数字或英文字母或下划线/^[a-zA-Z]\w{5,17}$/
+                        var reg = /^[a-zA-Z]\w{5,17}$/;
+
+                        //3. 获取用户名输入的值
+                        var username = $("#username").val();
+                        username = $.trim(username);  //截取掉字符串前后的空格
+
+
+                        //4. 如果正则表达式验证成功
+                        if (reg.test(username)) {
+                            //a. 清空验证消息 #msg 上一次验证会有验证信息回来.
+                            $("#msg").html("");
+                            //b. 发送异步请求进行注册
+                            //  以前我们会将请求的数据获取到后都放到{}里面传递到后端, 但是由于表单的数据较多,很繁琐
+                            //  现在有了一个好的更好的方法, 将这些参数封装成一个对象:
+                            var obj = $("#registerForm").serialize();// 这个将会将表单上所有的录入的属性和数据
+                            $.post("/travel/user", obj, function (resultInfo) {
+                                // 数据已经发送出去了. 服务端会响应json格式的数据, 前面已知将数据全部都封装到ResultInfo的对象中了.
+                                // 例如:{"falg":true} {"flag":false, "errorMsg":"xxx"}
+                                //c. 如果注册成功,跳转到注册成功页面,否则在#msg区域显示错误提示消息
+                                if(resultInfo.flag) {
+                                   location.href="/travel/register_ok.html";
+                                } else {
+                                    $("#msg").html(resultInfo.errorMsg);
+                                }
+                            }, "json")
+                        } else {
+                        //5. 如果正则表达式校验失败,在#msg区域提示用户名不合法,返回false
+                            $("#msg").html("用户名不合法");
+                        }
+                        return false;
+                    })
+                })
+            </script>
+            <!--注册表单-->
+            <form id="registerForm">
+                <!--提交处理请求的标识符-->
+                <!--这里name="action", 有了这个属性, 一个servlet搞定所有的情况,每次多传递一个action.-->
+                <input type="hidden" name="action" value="register">
+                <table style="margin-top: 25px;">
+                    <!--姓名-->
+                    <tr>
+                        <td class="td_left">
+                            <label for="username">用户名</label>
+                        </td>
+                        <td class="td_right">
+                            <input type="text" id="username" name="username" placeholder="请输入账号">
+                        </td>
+                    </tr>
+                    <!--密码-->
+                    <tr>
+                        <td class="td_left">
+                            <label for="password">密码</label>
+                        </td>
+                        <td class="td_right">
+                            <input type="text" id="password" name="password" placeholder="请输入密码">
+                        </td>
+                    </tr>
+                    <!--Email-->
+                    <tr>
+                        <td class="td_left">
+                            <label for="email">Email</label>
+                        </td>
+                        <td class="td_right">
+                            <input type="text" id="email" name="email" placeholder="请输入Email">
+                        </td>
+                    </tr>
+                    <!--姓名-->
+                    <tr>
+                        <td class="td_left">
+                            <label for="name">姓名</label>
+                        </td>
+                        <td class="td_right">
+                            <input type="text" id="name" name="name" placeholder="请输入真实姓名">
+                        </td>
+                    </tr>
+                    <!--手机号-->
+                    <tr>
+                        <td class="td_left">
+                            <label for="telephone">手机号</label>
+                        </td>
+                        <td class="td_right">
+                            <input type="text" id="telephone" name="telephone" placeholder="请输入您的手机号">
+                        </td>
+                    </tr>
+                    <!--性别-->
+                    <tr>
+                        <td class="td_left">
+                            <label for="sex">性别</label>
+                        </td>
+                        <td class="td_right gender">
+                            <input type="radio" id="sex" name="sex" value="男" checked> 男
+                            <input type="radio" name="sex" value="女"> 女
+                        </td>
+                    </tr>
+                    <!--出生-->
+                    <tr>
+                        <td class="td_left">
+                            <label for="birthday">出生日期</label>
+                        </td>
+                        <td class="td_right">
+                            <input type="date" id="birthday" name="birthday" placeholder="年/月/日">
+                        </td>
+                    </tr>
+                    <!--验证码-->
+                    <tr>
+                        <td class="td_left">
+                            <label for="check">验证码</label>
+                        </td>
+                        <td class="td_right check">
+                            <input type="text" id="check" name="check" class="check">
+                            <img src="checkCode" height="32px" alt="" onclick="changeCheckCode(this)">
+                            <script type="text/javascript">
+                                //图片点击事件
+                                function changeCheckCode(img) {
+                                    img.src = "checkCode?" + new Date().getTime();
+                                }
+                            </script>
+                        </td>
+                    </tr>
+                    <!--注册及错误信息-->
+                    <tr>
+                        <td class="td_left">
+                        </td>
+                        <td class="td_right check">
+                            <input type="submit" class="submit" value="注册">
+                            <span id="msg" style="color: red;"></span>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div class="rg_form_right">
+            <p>
+                已有账号？
+                <a href="#">立即登录</a>
+            </p>
+        </div>
+    </div>
+</div>
+<!--引入尾部-->
+<div id="footer"></div>
+<!--导入布局js，共享header和footer-->
+<script type="text/javascript" src="js/include.js"></script>
+
+</body>
+</html>
