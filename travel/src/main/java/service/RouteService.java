@@ -79,4 +79,8 @@ public class RouteService {
         }
         return list;
     }
+
+    public void addroute(Route route) {
+        routeDao.addroute(route);
+    }
 }

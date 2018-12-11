@@ -1,5 +1,6 @@
 package dao;
 
+import model.Route;
 import org.springframework.jdbc.core.JdbcTemplate;
 import utils.JdbcUtils;
 
@@ -84,5 +85,11 @@ public class RouteDao {
         //将结果也打印一下
         System.out.println(mapList); //作用是快速定位错误
         return mapList;
+    }
+
+    public void addroute(Route route) {
+        String sql = "insert into tab_route values (Null,?,?,?,?)";
+        Object[] params = {route.getRname(),route.getPrice(),route.getRouteIntroduce(),route.getRimage()};
+        jdbcTemplate.update(sql,params);
     }
 }
